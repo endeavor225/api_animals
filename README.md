@@ -79,6 +79,15 @@ node bin/server.js
 # Créer une nouvelle migration
 node ace make:migration create_animals_table
 
+# Créer un modèle
+node ace make:model Animal
+
+# Créer un contrôleur
+node ace make:controller AnimalsController
+
+# Créer un validateur
+node ace make:validator AnimalValidator
+
 # Exécuter les migrations
 node ace migration:run
 
@@ -108,7 +117,10 @@ node ace make:controller AnimalsController
 node ace make:middleware AuthMiddleware
 
 # Créer un validateur
-node ace make:validator CreateAnimalValidator
+node ace make:validator AnimalValidator
+
+# Créer une migration avec un modèle
+node ace make:model Animal -m
 ```
 
 ### Tests
@@ -165,7 +177,17 @@ npm run format
 
 ### Base de données
 
-Le projet supporte plusieurs bases de données. Configurez votre connexion dans `.env` :
+Le projet utilise actuellement un modèle Animal avec les champs suivants :
+
+- `id` : Identifiant unique (Primary Key)
+- `name` : Nom de l'animal
+- `species` : Espèce de l'animal
+- `age` : Âge de l'animal
+- `adopted` : Statut d'adoption (boolean)
+- `createdAt` : Date de création
+- `updatedAt` : Date de dernière modification
+
+Configurez votre connexion dans `.env` :
 
 **SQLite (par défaut)**
 
@@ -211,9 +233,19 @@ Pour configurer CORS, éditez `config/cors.ts` :
 
 ## 🔐 Authentification
 
-Le projet inclut un système d'authentification JWT. Les routes protégées utilisent le middleware `auth`.
+_Note : Le système d'authentification n'est pas encore implémenté dans cette version._
 
-### Commandes d'authentification
+Pour ajouter l'authentification JWT à votre projet :
+
+```bash
+# Installer le package d'authentification AdonisJS
+npm install @adonisjs/auth @adonisjs/session
+
+# Configurer l'authentification
+node ace configure @adonisjs/auth
+```
+
+### Commandes d'authentification futures
 
 ```bash
 # Créer un utilisateur via la console
@@ -224,23 +256,68 @@ node ace repl
 
 ## 📊 API Endpoints
 
-### Authentification
+### Accueil
 
 ```
-POST /api/auth/login     # Connexion
-POST /api/auth/register  # Inscription
-POST /api/auth/logout    # Déconnexion
-GET  /api/auth/me        # Profil utilisateur
+GET    /                 # Message de bienvenue
 ```
 
-### Animals (exemple)
+### Animals
 
 ```
-GET    /api/animals      # Liste des animaux
-GET    /api/animals/:id  # Détail d'un animal
-POST   /api/animals      # Créer un animal
-PUT    /api/animals/:id  # Modifier un animal
-DELETE /api/animals/:id  # Supprimer un animal
+GET    /animals          # Liste tous les animaux
+GET    /animals/:id      # Récupère un animal spécifique
+POST   /animals          # Crée un nouvel animal
+PUT    /animals/:id      # Met à jour un animal existant
+DELETE /animals/:id      # Supprime un animal
+```
+
+### Structure des données Animal
+
+```json
+{
+  "id": 1,
+  "name": "Buddy",
+  "species": "Chien",
+  "age": 3,
+  "adopted": false,
+  "createdAt": "2025-09-28T10:00:00.000Z",
+  "updatedAt": "2025-09-28T10:00:00.000Z"
+}
+```
+
+### Exemples de requêtes
+
+**Créer un animal :**
+
+```bash
+curl -X POST http://localhost:3333/animals \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Buddy",
+    "species": "Chien",
+    "age": 3,
+    "adopted": false
+  }'
+```
+
+**Récupérer tous les animaux :**
+
+```bash
+curl http://localhost:3333/animals
+```
+
+**Mettre à jour un animal :**
+
+```bash
+curl -X PUT http://localhost:3333/animals/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Buddy",
+    "species": "Chien",
+    "age": 4,
+    "adopted": true
+  }'
 ```
 
 ## 🧪 Tests
@@ -254,6 +331,31 @@ npm run test:coverage
 
 # Tests d'un fichier spécifique
 node ace test tests/functional/animals.spec.ts
+```
+
+## 🚀 Démarrage rapide
+
+Après avoir suivi les étapes d'installation :
+
+```bash
+# 1. Démarrer le serveur
+npm run dev
+
+# 2. Tester l'API
+curl http://localhost:3333/
+
+# 3. Créer votre premier animal
+curl -X POST http://localhost:3333/animals \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Rex",
+    "species": "Chien",
+    "age": 2,
+    "adopted": false
+  }'
+
+# 4. Lister tous les animaux
+curl http://localhost:3333/animals
 ```
 
 ## 📦 Déploiement

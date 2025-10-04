@@ -10,4 +10,4 @@ const properties = {
 }
 
 // Exporter le schéma de validation d'animal
-export const AnimalSchema = defineValidator(properties)
+export const AnimalValidator = defineValidator(properties)
